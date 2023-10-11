@@ -8,15 +8,32 @@ namespace PublisherData
     {
         public DbSet<Author> Authors { get; set; } = null!;
         public DbSet<Book> Books { get; set; } = null!;
+        public DbSet<Cover> Covers { get; set; } = null!;
+        public DbSet<Artist> Artists { get; set; } = null!;
+        public DbSet<ArtistCover> ArtistCovers { get; set; } = null!;
+
+        public PublisherDBContext()
+        {
+            
+        }
+        public PublisherDBContext(DbContextOptions<PublisherDBContext> options)
+            :base(options)
+        {
+            
+        }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer(
-                "Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = PubDatabase"
-                )
-                .LogTo(Console.WriteLine
-                , new[] { DbLoggerCategory.Database.Command.Name }
-                , LogLevel.Information );
+        { 
+            if(!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlServer(
+                          "Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = PubDatabase"
+                          )
+                          .LogTo(Console.WriteLine
+                          , new[] { DbLoggerCategory.Database.Command.Name }
+                          , LogLevel.Information)
+                         .EnableSensitiveDataLogging();
+            }
         }
 
         
@@ -35,7 +52,11 @@ namespace PublisherData
                 .HasForeignKey(b => b.AuthorFK)
                 .IsRequired(false);
 
-
+            modelBuilder.Entity<Artist>()
+                .HasMany(a => a.Covers)
+                .WithMany(c => c.Artists)
+                .UsingEntity<ArtistCover>(
+                 p => p.Property(ac => ac.DateCreated).HasDefaultValueSql("GetDate()")); 
             
             modelBuilder.Entity<Author>().HasData(new Author { AuthorId =1, FirstName="Roshny", LastName="Koshy" });
 
@@ -58,7 +79,20 @@ namespace PublisherData
                 new Book {BookId = 3, AuthorFK=3, Title = "The Left Hand of Darkness",
                 PublishDate=(DateTime)new DateTime(1969,3,1)} };
 
+
             modelBuilder.Entity<Book>().HasData(someBooks);
+
+            var someArtists = new Artist[]{
+                new Artist {ArtistId = 1, FirstName = "Pablo", LastName="Picasso"},
+                new Artist {ArtistId = 2, FirstName = "Dee", LastName="Bell"},
+                new Artist {ArtistId = 3, FirstName ="Katharine", LastName="Kuharic"} };
+            modelBuilder.Entity<Artist>().HasData(someArtists);
+
+            var someCovers = new Cover[]{
+                new Cover {CoverId = 1, BookId=1,DesignIdeas="How about a left hand in the dark?", DigitalOnly=false},
+                new Cover {CoverId = 2, BookId =2, DesignIdeas= "Should we put a clock?", DigitalOnly=true},
+                new Cover {CoverId = 3, BookId =3,DesignIdeas="A big ear in the clouds?", DigitalOnly = false}};
+            modelBuilder.Entity<Cover>().HasData(someCovers);
 
         }
     }

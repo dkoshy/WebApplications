@@ -7,5 +7,6 @@
         public DateTime PublishDate { get; set; }
         public decimal BasePrice { get; set; }
         public int? AuthorFK { get; set; }
+        public Cover? Cover { get; set; }
     }
 }

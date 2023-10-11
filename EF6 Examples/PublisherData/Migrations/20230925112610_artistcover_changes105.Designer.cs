@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PublisherData;
 
@@ -11,9 +12,10 @@ using PublisherData;
 namespace PublisherData.Migrations
 {
     [DbContext(typeof(PublisherDBContext))]
-    partial class PublisherDBContextModelSnapshot : ModelSnapshot
+    [Migration("20230925112610_artistcover_changes105")]
+    partial class artistcover_changes105
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -206,9 +208,6 @@ namespace PublisherData.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CoverId"), 1L, 1);
 
-                    b.Property<int?>("BookId")
-                        .HasColumnType("int");
-
                     b.Property<string>("DesignIdeas")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -218,31 +217,24 @@ namespace PublisherData.Migrations
 
                     b.HasKey("CoverId");
 
-                    b.HasIndex("BookId")
-                        .IsUnique()
-                        .HasFilter("[BookId] IS NOT NULL");
-
                     b.ToTable("Covers");
 
                     b.HasData(
                         new
                         {
                             CoverId = 1,
-                            BookId = 1,
                             DesignIdeas = "How about a left hand in the dark?",
                             DigitalOnly = false
                         },
                         new
                         {
                             CoverId = 2,
-                            BookId = 2,
                             DesignIdeas = "Should we put a clock?",
                             DigitalOnly = true
                         },
                         new
                         {
                             CoverId = 3,
-                            BookId = 3,
                             DesignIdeas = "A big ear in the clouds?",
                             DigitalOnly = false
                         });
@@ -270,21 +262,9 @@ namespace PublisherData.Migrations
                         .HasForeignKey("AuthorFK");
                 });
 
-            modelBuilder.Entity("PublisherDomain.Cover", b =>
-                {
-                    b.HasOne("PublisherDomain.Book", null)
-                        .WithOne("Cover")
-                        .HasForeignKey("PublisherDomain.Cover", "BookId");
-                });
-
             modelBuilder.Entity("PublisherDomain.Author", b =>
                 {
                     b.Navigation("Books");
-                });
-
-            modelBuilder.Entity("PublisherDomain.Book", b =>
-                {
-                    b.Navigation("Cover");
                 });
 #pragma warning restore 612, 618
         }

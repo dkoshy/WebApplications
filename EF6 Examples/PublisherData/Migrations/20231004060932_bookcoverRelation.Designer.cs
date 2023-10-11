@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PublisherData;
 
@@ -11,9 +12,10 @@ using PublisherData;
 namespace PublisherData.Migrations
 {
     [DbContext(typeof(PublisherDBContext))]
-    partial class PublisherDBContextModelSnapshot : ModelSnapshot
+    [Migration("20231004060932_bookcoverRelation")]
+    partial class bookcoverRelation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -228,21 +230,18 @@ namespace PublisherData.Migrations
                         new
                         {
                             CoverId = 1,
-                            BookId = 1,
                             DesignIdeas = "How about a left hand in the dark?",
                             DigitalOnly = false
                         },
                         new
                         {
                             CoverId = 2,
-                            BookId = 2,
                             DesignIdeas = "Should we put a clock?",
                             DigitalOnly = true
                         },
                         new
                         {
                             CoverId = 3,
-                            BookId = 3,
                             DesignIdeas = "A big ear in the clouds?",
                             DigitalOnly = false
                         });
