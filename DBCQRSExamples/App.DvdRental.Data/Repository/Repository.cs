@@ -1,13 +1,19 @@
 ﻿using App.DvdRental.Data.DbContext;
 using App.DvdRental.Data.Extentions;
 using App.DvdRental.Data.Models;
-using App.DvdRental.Domain.Interfaces;
 using Dapper;
 using System.Data.Common;
 
 namespace App.DvdRental.Data.Repository
 {
-    public abstract class Repository<T> : IRepository<T> where T : class
+    public interface IDapperRepository<T>
+    {
+        Task<QueryResult<IEnumerable<T>>> GetAllAsync(QueryCommannd query);
+        Task<QueryResult<T>> GetByIdAsync<TKey>(TKey Id, QueryCommannd query);
+    }
+
+
+    public  class Repository<T> : IDapperRepository<T> where T : class
     {
         protected readonly DapperContext _dapperContext;
 
@@ -17,15 +23,13 @@ namespace App.DvdRental.Data.Repository
             _dapperContext=dapperContext;
         }
 
-        protected QueryCommannd Query { get; set; }
-  
-        public async Task<QueryResult<IEnumerable<T>>> GetAllAsync()
+        public  async Task<QueryResult<IEnumerable<T>>> GetAllAsync(QueryCommannd query)
         {
             var result = new QueryResult<IEnumerable<T>>();
             try
             {
                 using var conn = _dapperContext.CreateConnection();
-                var data = await conn.QueryAsync<T>(Query.CommandText, Query.Parameters);
+                var data = await conn.QueryAsync<T>(query.CommandText,query.Parameters);
                 result.WrappSuccessResult(data);
             }
             catch (InvalidOperationException ex)
@@ -41,13 +45,13 @@ namespace App.DvdRental.Data.Repository
 
         }
 
-        public async Task<QueryResult<T>> GetByIdAsync<TKey>(TKey Id)
+        public  async Task<QueryResult<T>> GetByIdAsync<TKey>(TKey Id, QueryCommannd query)
         {
             var result = new QueryResult<T>();
             try
             {
                 using var conn = _dapperContext.CreateConnection();
-                var data = await conn.QuerySingleAsync<T>(Query.CommandText, Query.Parameters);
+                var data = await conn.QuerySingleAsync<T>(query.CommandText, query.Parameters);
                 result.WrappSuccessResult(data);
             }
             catch (InvalidOperationException ex)

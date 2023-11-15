@@ -10,11 +10,17 @@ namespace App.DvdRental.Application.Services
 
         public FilimDataService(FilimRepository filimRepository)
         {
-            _filimRepository=filimRepository;
+            _filimRepository= filimRepository as FilimRepository;
         }
-        public async Task<IEnumerable<Filim>> GetAllFilimsAsync()
+        public async Task<IEnumerable<Film>> GetAllFilimsAsync()
         {
             var result =  await _filimRepository.GetAllAsync();
+            return result.Data;
+        }
+
+        public async Task<Film> GetFilimById(int id)
+        {
+            var result = await _filimRepository.GetByIdAsync(id);
             return result.Data;
         }
     }

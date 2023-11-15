@@ -4,6 +4,7 @@ namespace App.DvdRental.Application.Interfaces
 {
     public interface IFilimDataService
     {
-        Task<IEnumerable<Filim>> GetAllFilimsAsync();
+        Task<IEnumerable<Film>> GetAllFilimsAsync();
+        Task<Film> GetFilimById(int id);
     }
 }

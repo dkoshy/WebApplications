@@ -15,6 +15,7 @@ namespace App.DvdRental.API.Extention
            return OK(data);
         }
 
+        #region Private Methods
         private static ActionResult<APIResponseBase> NotFound()
         {
             var response = new APIResponseBase()
@@ -26,10 +27,10 @@ namespace App.DvdRental.API.Extention
             return new NotFoundObjectResult(response);
 
         }
-        private static ActionResult<APIResponseBase> OK<T>(this T? data)
+        private static ActionResult<APIResponseBase> OK<T>(this T data)
         {
-            var responseType = typeof(APIResponse<T>);
-            var resposne = Activator.CreateInstance(responseType.MakeGenericType(data?.GetType()));
+            var responseType = typeof(APIResponse<>);
+            var resposne = Activator.CreateInstance(responseType.MakeGenericType(data.GetType()));
 
             resposne?.GetType().GetProperty("IsSuccess")?.SetValue(resposne, true);
             resposne?.GetType().GetProperty("Message")?.SetValue(resposne, "Success");
@@ -38,5 +39,6 @@ namespace App.DvdRental.API.Extention
 
             return new OkObjectResult(resposne);
         }
+        #endregion
     }
 }

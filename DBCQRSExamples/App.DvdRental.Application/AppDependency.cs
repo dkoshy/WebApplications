@@ -10,8 +10,16 @@ namespace App.DvdRental.Application
 
         public static IServiceCollection AddAppServices(this IServiceCollection services)
         {
-            services.AddScoped<IFilimDataService, FilimDataService>();
+            //Add Add MediatR
+            services.AddMediatR(cfg =>
+            {
+                cfg.RegisterServicesFromAssembly(typeof(AppDependency).Assembly);
+            });
+            //Add data services
             services.AddDataServices();
+            //Add app services
+            services.AddScoped<IFilimDataService, FilimDataService>();
+            services.AddScoped<ICustomerDataService, CustomerDataService>();
             return services;
         }
     }
