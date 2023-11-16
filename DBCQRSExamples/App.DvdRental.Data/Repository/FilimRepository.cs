@@ -1,4 +1,4 @@
-﻿using App.DvdRental.Data.DbContext;
+﻿using App.DvdRental.Data.DbContexts;
 using App.DvdRental.Data.Models;
 using App.DvdRental.Domain.Models.Entity;
 using Dapper;

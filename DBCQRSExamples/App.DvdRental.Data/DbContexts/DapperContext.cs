@@ -2,7 +2,7 @@
 using Npgsql;
 using System.Data;
 
-namespace App.DvdRental.Data.DbContext
+namespace App.DvdRental.Data.DbContexts
 {
     public class DapperContext
     {
