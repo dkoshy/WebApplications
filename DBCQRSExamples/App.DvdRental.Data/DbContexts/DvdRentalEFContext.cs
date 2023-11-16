@@ -8,6 +8,12 @@ namespace App.DvdRental.Data.DbContexts
     public class DvdRentalEFContext : DbContext
     {
         public DbSet<Category> Categories { get; set; }
+
+        public DvdRentalEFContext(DbContextOptions<DvdRentalEFContext> options)
+        :base(options)
+        {
+            
+        }
     }
 
 }

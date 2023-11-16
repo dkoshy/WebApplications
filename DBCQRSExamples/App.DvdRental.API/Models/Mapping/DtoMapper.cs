@@ -9,6 +9,6 @@ public class DtoMapper : Profile
     {
         CreateMap<CategoryDto,Category>()
           .ForMember(dest=> dest.Last_Update 
-          , opt=> opt.MapFrom(src => DateTime.Now) );
+          , opt=> opt.MapFrom(src => DateTime.UtcNow) );
     }
 }
