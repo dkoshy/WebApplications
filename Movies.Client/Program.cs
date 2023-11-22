@@ -1,13 +1,31 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Net.Http.Headers;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Movies.Client.Services; 
+using Movies.Client.Services;
+using Movies.Client.Services.DataClients;
 
 using IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((_, services) =>
     { 
         // register services for DI
         services.AddLogging(configure => configure.AddDebug().AddConsole());
+        services.AddHttpClient(); //default injecting
+
+        services.AddHttpClient("movieClient", config=>{
+            config.BaseAddress = new Uri("http://localhost:5001/api/");
+            config.DefaultRequestHeaders.Clear();
+            
+        }).ConfigureHttpClient(options =>{
+            options.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        });
+
+        services.AddHttpClient<MovieHttpClient>()
+        .ConfigureHttpClient(options => {
+            options.BaseAddress = new Uri("http://localhost:5001/api/");
+            options.DefaultRequestHeaders.Accept.Clear();
+            options.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        });
 
         // For the cancellation samples
         // services.AddScoped<IIntegrationService, CancellationSamples>();
@@ -64,7 +82,7 @@ catch (Exception generalException)
         "An exception happened while running the integration service.");
 }
 
-Console.ReadKey();
+Console.Read();
 
 await host.RunAsync();
  
