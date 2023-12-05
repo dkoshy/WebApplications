@@ -23,7 +23,11 @@ public class CRUDSamples : IIntegrationService
        // await GetallMoies();
        //await GetMovieByNamedClient();
        //await GetMoviesByTypedClient();
-       await GetMoviesByTypedClientMethod();
+       //await GetMoviesByTypedClientMethod();
+       //await GetMoviesById();
+       //await CreateMovie();
+       //await Delete();
+       await Update();
     }
 
     public  async Task<IEnumerable<Movie>?> GetallMoies()
@@ -78,4 +82,27 @@ public class CRUDSamples : IIntegrationService
         var movies = await _clientForMovieHttp.GetMovies();
         return movies;
     }
-}
+
+    public async Task<Movie?> GetMoviesById()
+    {
+        var movie = await _clientForMovieHttp.GetMovieById(new Guid("26fcbcc4-b7f7-47fc-9382-740c12246b59"));
+        return movie;
+    } 
+
+    public async Task<Movie> CreateMovie()
+    {
+        var movie = await _clientForMovieHttp.CrateaNewMovie();
+        return movie;
+    }
+
+    public async Task Delete()
+    {
+        await _clientForMovieHttp.DeleteMovies(new Guid("3fcf8012-60e2-4d08-b4db-404e79c06918"));
+    }
+
+    public async Task Update()
+    {
+        var updatedData = await _clientForMovieHttp.UpdateMovie(new Guid("5b1c2b4d-48c7-402a-80c3-cc796ad49c6b"));
+    }
+    
+} 
