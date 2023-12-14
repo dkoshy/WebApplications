@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Net;
+using System.Net.Http.Headers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -12,20 +13,37 @@ using IHost host = Host.CreateDefaultBuilder(args)
         services.AddLogging(configure => configure.AddDebug().AddConsole());
         services.AddHttpClient(); //default injecting
 
-        services.AddHttpClient("movieClient", config=>{
+        services.AddHttpClient("movieClient", config =>
+        {
             config.BaseAddress = new Uri("http://localhost:5001/api/");
             config.DefaultRequestHeaders.Clear();
-            
-        }).ConfigureHttpClient(options =>{
+
+        })
+        .ConfigurePrimaryHttpMessageHandler(handler => //can't be override.
+        {
+            var httphandler = new SocketsHttpHandler();
+            httphandler.AllowAutoRedirect = false;
+            return httphandler;
+        })
+        .ConfigureHttpClient(options =>
+        {
             options.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         });
+
 
         services.AddHttpClient<MovieHttpClient>()
         .ConfigureHttpClient(options => {
             options.BaseAddress = new Uri("http://localhost:5001/api/");
+            options.Timeout = new TimeSpan(0,0,30);
             options.DefaultRequestHeaders.Accept.Clear();
             options.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+           })
+        .ConfigurePrimaryHttpMessageHandler(config =>{
+            var handler = new SocketsHttpHandler();
+            handler.AutomaticDecompression = DecompressionMethods.GZip;
+            return  handler;
         });
+        
 
         // For the cancellation samples
         // services.AddScoped<IIntegrationService, CancellationSamples>();
@@ -46,16 +64,16 @@ using IHost host = Host.CreateDefaultBuilder(args)
         // services.AddScoped<IIntegrationService, FaultsAndErrorsSamples>();
 
         // For the HttpClientFactory samples
-        // services.AddScoped<IIntegrationService, HttpClientFactorySamples>();
+        //services.AddScoped<IIntegrationService, HttpClientFactorySamples>();
 
         // For the local streams samples
-        // services.AddScoped<IIntegrationService, LocalStreamsSamples>();
+       //  services.AddScoped<IIntegrationService, LocalStreamsSamples>();
 
         // For the partial update samples
-         services.AddScoped<IIntegrationService, PartialUpdateSamples>();
+        // services.AddScoped<IIntegrationService, PartialUpdateSamples>();
 
         // For the remote streaming samples
-        // services.AddScoped<IIntegrationService, RemoteStreamingSamples>();
+       //services.AddScoped<IIntegrationService, RemoteStreamingSamples>();
 
     }).Build();
 
