@@ -22,7 +22,7 @@ builder.Services.AddControllers(options =>
 
 // add support for (de)compressing requests/responses (eg gzip)
 builder.Services.AddResponseCompression();
-builder.Services.AddRequestDecompression();
+//builder.Services.AddRequestDecompression();
 
 // register the DbContext on the container, getting the
 // connection string from appSettings   
@@ -80,7 +80,7 @@ app.UseResponseCompression();
 
 // use request decompression (client should pass through 
 // Content-Encoding)
-app.UseRequestDecompression();
+//app.UseRequestDecompression();
 
 app.UseAuthorization();
 

@@ -5,13 +5,14 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Movies.Client.Services;
 using Movies.Client.Services.DataClients;
+using Polly;
 
 using IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((_, services) =>
     { 
         // register services for DI
         services.AddLogging(configure => configure.AddDebug().AddConsole());
-        services.AddHttpClient(); //default injecting
+        //services.AddHttpClient(); //default injectingz
 
         services.AddHttpClient("movieClient", config =>
         {
@@ -38,7 +39,10 @@ using IHost host = Host.CreateDefaultBuilder(args)
             options.DefaultRequestHeaders.Accept.Clear();
             options.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
            })
-        .ConfigurePrimaryHttpMessageHandler(config =>{
+           .AddPolicyHandler(Policy.HandleResult<HttpResponseMessage>(
+              response => !response.IsSuccessStatusCode)
+            .RetryAsync(5))
+            .ConfigurePrimaryHttpMessageHandler(config =>{
             var handler = new SocketsHttpHandler();
             handler.AutomaticDecompression = DecompressionMethods.GZip;
             return  handler;
@@ -46,7 +50,7 @@ using IHost host = Host.CreateDefaultBuilder(args)
         
 
         // For the cancellation samples
-        // services.AddScoped<IIntegrationService, CancellationSamples>();
+       // services.AddScoped<IIntegrationService, CancellationSamples>();
 
         // For the compression samples
         // services.AddScoped<IIntegrationService, CompressionSamples>();
@@ -55,13 +59,13 @@ using IHost host = Host.CreateDefaultBuilder(args)
         //services.AddScoped<IIntegrationService, CRUDSamples>();
 
         // For the compression samples
-        // services.AddScoped<IIntegrationService, CompressionSamples>();
+        //services.AddScoped<IIntegrationService, CompressionSamples>();
 
         // For the custom message handler samples
         // services.AddScoped<IIntegrationService, CustomMessageHandlersSamples>();
 
         // For the faults and errors samples
-        // services.AddScoped<IIntegrationService, FaultsAndErrorsSamples>();
+        services.AddScoped<IIntegrationService, FaultsAndErrorsSamples>();
 
         // For the HttpClientFactory samples
         //services.AddScoped<IIntegrationService, HttpClientFactorySamples>();

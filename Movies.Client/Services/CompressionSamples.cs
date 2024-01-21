@@ -1,5 +1,4 @@
-﻿using System.Formats.Asn1;
-using System.IO.Compression;
+﻿using System.IO.Compression;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using Movies.Client.Models;
@@ -17,8 +16,8 @@ public class CompressionSamples : IIntegrationService
     }
     public async Task RunAsync()
     {
-        await GetMovieTrailer();
-        //await CreateNewTrailereAsync();
+        //await GetMovieTrailer();
+        await CreateNewTrailereAsync();
     }
 
 
@@ -46,8 +45,8 @@ public class CompressionSamples : IIntegrationService
         var movieId = new Guid("5b1c2b4d-48c7-402a-80c3-cc796ad49c6b");
 
         var random = new Random();
-        var genrateByteLength = random.Next(52428800, 104857600);
-        var generatedBytes = new byte[genrateByteLength];
+        //var genrateByteLength = random.Next(52428800, 104857600);
+        var generatedBytes = new byte[2500900];
         random.NextBytes(generatedBytes);
 
         var trailer = new TrailerForCreation()
@@ -58,7 +57,7 @@ public class CompressionSamples : IIntegrationService
             Bytes = generatedBytes
         };
 
-        using var memmorystream = new MemoryStream();
+        var memmorystream = new MemoryStream();
         await JsonSerializer.SerializeAsync(memmorystream
             , trailer);
         memmorystream.Seek(0, SeekOrigin.Begin);
@@ -66,30 +65,31 @@ public class CompressionSamples : IIntegrationService
         using (var request = new HttpRequestMessage(HttpMethod.Post
                 , $"movies/{movieId}/trailers"))
         {
-            using var compressedstream = new MemoryStream();
-            using var gzipstream = new GZipStream(memmorystream,
+            request.Headers.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
+            var compressedstream = new MemoryStream();
+            var gzipstream = new GZipStream(compressedstream,
             CompressionMode.Compress);
 
             memmorystream.CopyTo(gzipstream);
             gzipstream.Flush();
             compressedstream.Position = 0;
 
-            using var actualstream = new StreamContent(compressedstream);
-            actualstream.Headers.ContentType = new MediaTypeWithQualityHeaderValue("application/json");
-            actualstream.Headers.ContentEncoding.Add("gzip");
-
-            request.Content = actualstream;
-            request.Headers.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
-
-            using (var response = await _httpClient.SendAsync(request
-                 , HttpCompletionOption.ResponseHeadersRead))
+            using (var actualstream = new StreamContent(compressedstream))
             {
+                actualstream.Headers.ContentType = new MediaTypeWithQualityHeaderValue("application/json");
+                actualstream.Headers.ContentEncoding.Add("gzip");
+                request.Content = actualstream;
+                var response = await _httpClient.SendAsync(request
+                     , HttpCompletionOption.ResponseHeadersRead);
+
                 response.EnsureSuccessStatusCode();
                 var content = await response.Content.ReadAsStreamAsync();
                 var newTrailer = await JsonSerializer.DeserializeAsync<Trailer>(content
                 , new JsonSerializerOptions(JsonSerializerDefaults.Web));
                 return newTrailer;
+
             }
+
         }
 
     }
